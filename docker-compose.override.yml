@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  php:
+    build:
+      target: app_php_dev
+    volumes:
+      - ./:/var/www/symfony_docker
+    environment:
+      XDEBUG_MODE: off
+      PHP_IDE_CONFIG: serverName=localhost
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+###> doctrine/doctrine-bundle ###
+  database:
+    ports:
+      - '4004:5432'
+###< doctrine/doctrine-bundle ###

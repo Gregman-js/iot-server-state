@@ -1,0 +1,45 @@
+name: PHP Code Quality Check
+
+on:
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  code-quality:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+
+      - name: Install Composer Dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Audit
+        run: composer audit
+
+      - name: Rector
+        run: |
+          composer --working-dir=tools/rector install
+          tools/rector/vendor/bin/rector process --dry-run
+
+      - name: PHP-CS-Fixer
+        run: |
+          composer --working-dir=tools/php-cs-fixer install
+          tools/php-cs-fixer/vendor/bin/php-cs-fixer fix -v --allow-risky=yes --dry-run --diff --using-cache=no
+
+      - name: PHPStan
+        run: |
+          composer --working-dir=tools/phpstan install
+          tools/phpstan/vendor/bin/phpstan analyse --memory-limit 512M
+
+      - name: Deptrac
+        run: |
+          composer --working-dir=tools/deptrac install
+          tools/deptrac/vendor/bin/deptrac

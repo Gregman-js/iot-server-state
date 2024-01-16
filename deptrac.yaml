@@ -1,0 +1,31 @@
+parameters:
+  Modules: (Telegram)
+
+deptrac:
+  paths:
+    - ./src
+  layers:
+    - name: Domain
+      collectors: [ { type: directory, regex: src/%Modules%/Domain/.* } ]
+
+    - name: Application
+      collectors: [ { type: directory, regex: src/%Modules%/Application/.* } ]
+
+    - name: Infrastructure
+      collectors: [ { type: directory, regex: src/%Modules%/Infrastructure/.* } ]
+
+    - name: Interface
+      collectors: [ { type: directory, regex: src/%Modules%/Interface/.* } ]
+
+    - name: Vendor
+      collectors: [
+        { type: classLike, regex: Symfony\\Component\\.* },
+        { type: classNameRegex, value: '#^Doctrine\\.*#' }
+      ]
+
+
+  ruleset:
+    Domain: [ ]
+    Application: [ Domain, Vendor ]
+    Infrastructure: [ Domain, Application, Interface, Vendor ]
+    Interface: [ Domain, Application, Infrastructure, Vendor ]

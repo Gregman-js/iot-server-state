@@ -10,3 +10,6 @@
 ###< symfony/framework-bundle ###
 
 .idea
+.php-cs-fixer.cache
+.deptrac.cache
+.phpstan.neon
