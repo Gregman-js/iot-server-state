@@ -1,31 +1,55 @@
 parameters:
-  Modules: (Telegram)
+  Modules: (State)
 
 deptrac:
   paths:
     - ./src
   layers:
     - name: Domain
-      collectors: [ { type: directory, regex: src/%Modules%/Domain/.* } ]
+      collectors:
+        - type: directory
+          regex: src/%Modules%/Domain/.*
 
     - name: Application
-      collectors: [ { type: directory, regex: src/%Modules%/Application/.* } ]
+      collectors:
+        -   type: directory
+            regex: src/%Modules%/Application/.*
 
     - name: Infrastructure
-      collectors: [ { type: directory, regex: src/%Modules%/Infrastructure/.* } ]
+      collectors:
+        -   type: directory
+            regex: src/%Modules%/Infrastructure/.*
 
     - name: Interface
-      collectors: [ { type: directory, regex: src/%Modules%/Interface/.* } ]
+      collectors:
+        -   type: directory
+            regex: src/%Modules%/Entrypoint/.*
+
+    - name: SharedModel
+      collectors:
+        - type: classLike
+          value: Symfony\\Component\\Uid\\Uuid
 
     - name: Vendor
-      collectors: [
-        { type: classLike, regex: Symfony\\Component\\.* },
-        { type: classNameRegex, value: '#^Doctrine\\.*#' }
-      ]
+      collectors:
+        - type: bool
+          must:
+            - type: classLike
+              value: Symfony\\Component
+          must_not:
+            - type: classLike
+              value: Symfony\\Component\\Uid\\Uuid
+        - type: classLike
+          value: Symfony\\Bridge
+        - type: classLike
+          value: Doctrine\\
+        - type: classLike
+          value: Override
+
 
 
   ruleset:
-    Domain: [ ]
-    Application: [ Domain, Vendor ]
-    Infrastructure: [ Domain, Application, Interface, Vendor ]
-    Interface: [ Domain, Application, Infrastructure, Vendor ]
+    Domain: [ SharedModel ]
+    Application: [ Domain, Vendor, SharedModel ]
+    Infrastructure: [ Domain, Application, Interface, Vendor, SharedModel ]
+    Interface: [ Domain, Application, Infrastructure, Vendor, SharedModel ]

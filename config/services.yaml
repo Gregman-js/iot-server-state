@@ -2,3 +2,10 @@ services:
     _defaults:
         autowire: true
         autoconfigure: true
+
+    App\State\:
+        resource: '../src/State/*'
+
+    App\State\Entrypoint\Http\Query\:
+        resource: '../src/State/Entrypoint/Http/Query/'
+        tags: [ 'controller.service_arguments' ]
